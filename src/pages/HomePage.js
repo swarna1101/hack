@@ -92,69 +92,66 @@ const keywords = [
     const [popupContent, setPopupContent] = useState('');
     const [popupTitle, setPopupTitle] = useState('');
     
-  // Use useEffect to log the popup content when it changes
-  useEffect(() => {
-    console.log("Content State Updated:", popupContent);
-  }, [popupContent]);
-  const handleYesClick = async () => {
-    if (selectedKeyword) {
-      const articleContent = await fetchData(selectedKeyword);
-      setPopupContent(articleContent);
-    }
-  };
-  
-  const handleNoClick = () => {
-    spin(); // Start spinning animation again
-  };
-  // fetchData function
-  const fetchData = async (keyword) => {
-    try {
-      const response = await axios.get(`https://amitesh.suryasekhardatta.com/game?q=${encodeURIComponent(keyword)}`);
-      //console.log("Article Data Immediately After Fetching:", response.data.article); // Confirm the article property exists
-
-      if (response.data && response.data.article !== undefined) {
-        setPopupContent(response.data.article); // Ensure this key exists in the response
-        setPopupTitle(response.data.data_c);
-        return response.data.article;
-        setShowPopup(true);
-      } else {
-        // Handle the scenario where the article property is not as expected
-        console.error("Article data is undefined:", response.data);
-        setPopupContent("Article data is not available.");
-        setPopupTitle(response.data.data_c || "Information");
-        setShowPopup(true);
-      }
-    } catch (error) {
-      console.error("Fetching error: ", error);
-      setPopupContent("Failed to fetch data. Please try again later.");
-      setPopupTitle("Error");
-      setShowPopup(true);
-    }
-  };
-      
-  
-    const spin = () => {
-      setIsSpinning(true);
-      let currentIndex = 0;
-      const spinner = setInterval(() => {
-        setSelectedKeyword(keywords[currentIndex]);
-        currentIndex = (currentIndex + 1) % keywords.length;
-      }, 50);
-  
-      setTimeout(async () => {
-        clearInterval(spinner);
-        const randomIndex = Math.floor(Math.random() * keywords.length);
-        setSelectedKeyword(keywords[randomIndex]);
-        const articleContent = await fetchData(keywords[randomIndex]);
-        setPopupContent(articleContent);
-        setIsSpinning(false);
-        setShowPopup(true);
-      }, 2000); // Duration of spin animation
-    };
-  
-    return (
-      <div className="bg-[#2c4a27] text-[#f2f2f2] min-h-screen flex flex-col items-center justify-center p-4">
+    useEffect(() => {
+        console.log("Content State Updated:", popupContent);
+      }, [popupContent]);
+    
+      const handleYesClick = async () => {
+        if (selectedKeyword) {
+          const articleContent = await fetchData(selectedKeyword);
+          setPopupContent(articleContent);
+        }
+      };
+    
+      const handleNoClick = () => {
+        spin();
+      };
+    
+      const fetchData = async (keyword) => {
+        try {
+          const response = await axios.get(`https://amitesh.suryasekhardatta.com/game?q=${encodeURIComponent(keyword)}`);
+          if (response.data && response.data.article !== undefined) {
+            setPopupContent(response.data.article);
+            setPopupTitle(response.data.data_c);
+            setShowPopup(true);
+            return response.data.article;
+          } else {
+            console.error("Article data is undefined:", response.data);
+            setPopupContent("Article data is not available.");
+            setPopupTitle(response.data.data_c || "Information");
+            setShowPopup(true);
+          }
+        } catch (error) {
+          console.error("Fetching error: ", error);
+          setPopupContent("Failed to fetch data. Please try again later.");
+          setPopupTitle("Error");
+          setShowPopup(true);
+        }
+      };
+    
+      const spin = () => {
+        setIsSpinning(true);
+        let currentIndex = 0;
+        const spinner = setInterval(() => {
+          setSelectedKeyword(keywords[currentIndex]);
+          currentIndex = (currentIndex + 1) % keywords.length;
+        }, 50);
+    
+        setTimeout(async () => {
+          clearInterval(spinner);
+          const randomIndex = Math.floor(Math.random() * keywords.length);
+          setSelectedKeyword(keywords[randomIndex]);
+          setIsSpinning(false);
+          setShowPopup(true);
+        }, 2000);
+      };
+    
+      return (
+        <div className="bg-[#2c4a27] text-[#f2f2f2] min-h-screen flex flex-col items-center justify-center p-4">
         <h1 className="text-5xl font-bold mb-8">Personal Finance 101</h1>
+        <div className={`mt-8 text-3xl font-bold ${isSpinning ? 'animate-bounce' : ''}`}>
+          {selectedKeyword}
+        </div>
         <button
           className={`px-6 py-3 text-white font-bold rounded ${isSpinning ? 'bg-gray-500' : 'bg-blue-500 hover:bg-blue-700'} transition duration-300 ease-in-out`}
           onClick={spin}
@@ -162,34 +159,30 @@ const keywords = [
         >
           {isSpinning ? 'Spinning...' : "Let's Play"}
         </button>
-        <div className={`mt-8 text-3xl font-bold ${isSpinning ? 'animate-bounce' : ''}`}>
-          {selectedKeyword}
-        </div>
         {showPopup && (
-  <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center">
-    <div className="bg-white p-6 rounded shadow-lg text-black">
-      <h2 className="text-2xl font-bold mb-4">{popupTitle}</h2>
-      <p className="mb-4">{popupContent}</p>
-      <div className="flex justify-between">
-        <button
-          onClick={handleYesClick}
-          className="px-4 py-2 bg-green-500 hover:bg-green-700 text-white font-bold rounded"
-        >
-          Yes
-        </button>
-        <button
-          onClick={handleNoClick}
-          className="px-4 py-2 bg-red-500 hover:bg-red-700 text-white font-bold rounded"
-        >
-          No
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
+          <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center">
+            <div className="bg-white p-6 rounded shadow-lg text-black">
+              <h2 className="text-2xl font-bold mb-4">{popupTitle}</h2>
+              <p className="mb-4">{popupContent}</p>
+              <div className="flex justify-between">
+                <button
+                  onClick={handleYesClick}
+                  className="px-4 py-2 bg-green-500 hover:bg-green-700 text-white font-bold rounded"
+                >
+                  Yes
+                </button>
+                <button
+                  onClick={handleNoClick}
+                  className="px-4 py-2 bg-red-500 hover:bg-red-700 text-white font-bold rounded"
+                >
+                  No
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
-  };
-  
-export default HomePage;
+  };    
+    
+    export default HomePage;
