@@ -2,47 +2,55 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const EmiCalculator = () => {
-  const [formData, setFormData] = useState({
-    principal: 1000,
-    interest: 10,
-    tenure: 5,
-  });
-  const [emiResult, setEmiResult] = useState(null);
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const calculateEmi = async (formDataToSend) => {
-    console.log(formDataToSend);
-    try {
-        const response = await axios.post('https://amitesh.suryasekhardatta.com/emi', formDataToSend, {
+    const [formData, setFormData] = useState({
+      principal: 1000,
+      interest: 10,
+      tenure: 5,
+    });
+    const [emiResult, setEmiResult] = useState(null);
+    const [amortizationSchedule, setAmortizationSchedule] = useState([]);
+  
+    const handleChange = (e) => {
+      setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+  
+    const calculateEmi = async (formDataToSend) => {
+      try {
+        const response = await axios.post(
+          'https://amitesh.suryasekhardatta.com/emi',
+          formDataToSend,
+          {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
-          });
-          const responseData = response.data;
-          console.log(responseData);
-      if (response.data && response.data.EMI !== undefined) {
-        setEmiResult(response.data.EMI);
-      } else {
+          }
+        );
+  
+        const responseData = response.data;
+  
+        if (responseData.EMI !== undefined) {
+          setEmiResult(responseData.EMI);
+          if (responseData['Amortization Schedule']) {
+            setAmortizationSchedule(responseData['Amortization Schedule']);
+          }
+        } else {
+          setEmiResult('Error: Unable to calculate EMI');
+        }
+      } catch (error) {
+        console.error('Error making the API request:', error);
         setEmiResult('Error: Unable to calculate EMI');
       }
-    } catch (error) {
-      console.error('Error making the API request:', error);
-      setEmiResult('Error: Unable to calculate EMI');
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const formDataToSend = new FormData();
-    formDataToSend.append('principal', formData.principal);
-    formDataToSend.append('interest', formData.interest);
-    formDataToSend.append('tenure', formData.tenure);
-
-    calculateEmi(formDataToSend);
-  };
+    };
+  
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      const formDataToSend = new FormData();
+      formDataToSend.append('principal', formData.principal);
+      formDataToSend.append('interest', formData.interest);
+      formDataToSend.append('tenure', formData.tenure);
+  
+      calculateEmi(formDataToSend);
+    };
 
   return (
     <div className="bg-[#2c4a27] text-white min-h-screen flex flex-col items-center justify-center p-4">
@@ -92,6 +100,34 @@ const EmiCalculator = () => {
 
       {emiResult !== null && (
         <div className="mt-4"><strong>EMI Result:</strong> {emiResult}</div>
+      )}
+
+{amortizationSchedule.length > 0 && (
+        <div className="mt-6">
+          <h3 className="text-xl font-semibold mb-2">Amortization Schedule:</h3>
+          <table className="w-full border-collapse border border-white">
+            <thead>
+              <tr>
+                <th className="border border-white px-4 py-2">Month</th>
+                <th className="border border-white px-4 py-2">EMI</th>
+                <th className="border border-white px-4 py-2">Interest</th>
+                <th className="border border-white px-4 py-2">Principal</th>
+                <th className="border border-white px-4 py-2">Remaining Principal</th>
+              </tr>
+            </thead>
+            <tbody>
+              {amortizationSchedule.map((entry) => (
+                <tr key={entry.Month}>
+                  <td className="border border-white px-4 py-2">{entry.Month}</td>
+                  <td className="border border-white px-4 py-2">{entry.EMI}</td>
+                  <td className="border border-white px-4 py-2">{entry.Interest}</td>
+                  <td className="border border-white px-4 py-2">{entry.Principal}</td>
+                  <td className="border border-white px-4 py-2">{entry['Remaining Principal']}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
