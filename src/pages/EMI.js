@@ -1,5 +1,3 @@
-// EmiCalculator.js
-
 import React, { useState } from 'react';
 import axios from 'axios';
 
@@ -15,11 +13,18 @@ const EmiCalculator = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const calculateEmi = async () => {
+  const calculateEmi = async (formDataToSend) => {
+    console.log(formDataToSend);
     try {
-      const response = await axios.post('https://amitesh.suryasekhardatta.com/emi', formData);
-      if (response.data && response.data.emi !== undefined) {
-        setEmiResult(response.data.emi);
+        const response = await axios.post('https://amitesh.suryasekhardatta.com/emi', formDataToSend, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
+          const responseData = response.data;
+          console.log(responseData);
+      if (response.data && response.data.EMI !== undefined) {
+        setEmiResult(response.data.EMI);
       } else {
         setEmiResult('Error: Unable to calculate EMI');
       }
@@ -31,7 +36,12 @@ const EmiCalculator = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    calculateEmi();
+    const formDataToSend = new FormData();
+    formDataToSend.append('principal', formData.principal);
+    formDataToSend.append('interest', formData.interest);
+    formDataToSend.append('tenure', formData.tenure);
+
+    calculateEmi(formDataToSend);
   };
 
   return (

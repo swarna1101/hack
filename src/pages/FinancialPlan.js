@@ -1,7 +1,12 @@
 // FinancialPlan.js
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Pie } from 'react-chartjs-2';
+import Chart from 'chart.js/auto'
+
+//import PieChart from '../components/PieChart'; // Update the import path as needed
+
 
 const FinancialPlan = () => {
   const [formData, setFormData] = useState({
@@ -15,6 +20,51 @@ const FinancialPlan = () => {
     year_of_major_expense: 2025,
   });
   const [financialPlan, setFinancialPlan] = useState(null);
+  const [investmentData, setInvestmentData] = useState(null);
+  const [myChart, setMyChart] = useState(null);
+
+ // Destroy existing chart when component unmounts
+ useEffect(() => {
+    return () => {
+      if (myChart) {
+        myChart.destroy();
+      }
+    };
+  }, [myChart]);
+
+  // Function to create or update the chart
+  const createChart = () => {
+    if (myChart) {
+      myChart.destroy();
+    }
+    const ctx = document.getElementById('myChart');
+    const newChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: Object.keys(investmentData),
+        datasets: [
+          {
+            data: Object.values(investmentData),
+            backgroundColor: [
+              'red',
+              'blue',
+              'green',
+              'yellow',
+              'orange',
+              'purple',
+            ],
+          },
+        ],
+      },
+    });
+    setMyChart(newChart);
+  };
+
+  useEffect(() => {
+    if (investmentData !== null) {
+      createChart();
+    }
+  }, [investmentData]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -22,10 +72,29 @@ const FinancialPlan = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const formDataToSend = new FormData();
+    formDataToSend.append('age', formData.age);
+    formDataToSend.append('annual_income', formData.annual_income);
+    formDataToSend.append('risk_appetite', formData.risk_appetite);
+    formDataToSend.append('income_growth_rate', formData.income_growth_rate);
+    formDataToSend.append('annual_expense', formData.annual_expense);
+    formDataToSend.append('expense_growth', formData.expense_growth);
+    formDataToSend.append('major_expense', formData.major_expense);
+    formDataToSend.append('year_of_major_expense', formData.year_of_major_expense);
+
     try {
-      const response = await axios.post('https://amitesh.suryasekhardatta.com/financial_plan', formData);
-      if (response.data && response.data.financial_plan !== undefined) {
-        setFinancialPlan(response.data.financial_plan);
+        const response = await axios.post('https://amitesh.suryasekhardatta.com/financial_plan', formDataToSend, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        const responseData = response.data;
+        console.log(responseData);
+
+      if (response.data !== undefined) {
+        setFinancialPlan(responseData);
+        setInvestmentData(responseData['Investment Allocation']); // Set Investment Allocation data
+        console.log(financialPlan);
       } else {
         setFinancialPlan('Error: Unable to generate a financial plan');
       }
@@ -146,9 +215,25 @@ const FinancialPlan = () => {
 
       {financialPlan !== null && (
         <div className="mt-4">
-          <strong>Financial Plan:</strong> {financialPlan}
+          <strong>Financial Plan:</strong><br />
+            <strong>Needs:</strong> {financialPlan['Needs']} <br />
+            <strong>Wants:</strong> {financialPlan['Wants']} <br />
+            <strong>Savings:</strong> {financialPlan['Savings']} <br />
         </div>
       )}
+        {investmentData !== null && (
+  <div className="mt-4">
+    <strong>Investment Allocation:</strong>
+    {investmentData !== null && (
+        <div className="mt-4 text-white">
+          <strong>Investment Allocation:</strong>
+          <canvas id="myChart" />
+        </div>
+      )}
+  </div>
+)}
+
+
     </div>
   );
 };

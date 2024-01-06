@@ -1,5 +1,4 @@
 // src/components/NPV.js
-
 import React, { useState } from 'react';
 import axios from 'axios';
 
@@ -19,19 +18,37 @@ const NPV = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const formDataToSend = new FormData();
+    formDataToSend.append('initial_investment', formData.initial_investment);
+    formDataToSend.append('required_rate_of_return', formData.required_rate_of_return);
+    formDataToSend.append('number_of_periods', formData.number_of_periods);
+    formDataToSend.append('annual_inflow', formData.annual_inflow);
+    formDataToSend.append('growth_rate', formData.growth_rate);
+
     try {
-      const response = await axios.post('https://amitesh.suryasekhardatta.com/npv', formData);
-      const parsedResult = parseFloat(response.data).toFixed(2); // Parse and round to 2 decimal places
-      setResult(parsedResult);
+      const response = await axios.post('https://amitesh.suryasekhardatta.com/npv', formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      const responseData = response.data;
+
+      // Check if the response contains NPV and Result properties
+      if (responseData && responseData['Net Present Value (NPV)'] !== undefined && responseData['Result'] !== undefined) {
+        setResult(responseData);
+      } else {
+        console.error('Invalid response data:', responseData);
+      }
     } catch (error) {
       console.error('Error making the API request:', error);
     }
   };
-
+  
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#2c4a27] text-white p-4">
-      <h2 className="text-3xl font-bold mb-4">NPV Calculator</h2>
-      <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
+    <h2 className="text-3xl font-bold mb-4">NPV Calculator</h2>
+    <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
         
         {/* Initial Investment */}
         <div>
@@ -98,8 +115,13 @@ const NPV = () => {
           Calculate NPV
         </button>
       </form>
-
-      {result && <div className="mt-4"><strong>NPV Result:</strong> {result}</div>}
+      {result && (
+        <div className="mt-4">
+          <strong>Net Present Value (NPV):</strong> {result['Net Present Value (NPV)']}
+          <br />
+          <strong>Result:</strong> {result['Result']}
+        </div>
+      )}
     </div>
   );
 };
