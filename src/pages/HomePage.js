@@ -164,10 +164,11 @@ const HomePage = () => {
                     <div className="bg-white p-6 rounded shadow-lg text-black">
                         <h2 className="text-2xl font-bold mb-4">{popupTitle}</h2>
                         <p className="mb-4">{popupContent}</p>
+                        <p className="text-lg mb-4">Do you want more information for this?</p> {/* This line is added */}
                         <div className="flex justify-between">
                             <button
                                 onClick={handleYesClick}
-                                className="px-4 py-2 bg-green-500 hover:bg-green-700 text-white font-bold rounded mr-2" // Added margin-right to "Yes" button
+                                className="px-4 py-2 bg-green-500 hover:bg-green-700 text-white font-bold rounded mr-2"
                             >
                                 Yes
                             </button>
