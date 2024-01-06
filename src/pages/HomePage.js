@@ -83,29 +83,29 @@ const keywords = [
     "Student Loans, Debt Management",
     "Credit Usage, Financial Health"
   ];
-  
 
-  const HomePage = () => {
+
+const HomePage = () => {
     const [selectedKeyword, setSelectedKeyword] = useState('');
     const [showPopup, setShowPopup] = useState(false);
     const [isSpinning, setIsSpinning] = useState(false);
     const [popupContent, setPopupContent] = useState('');
     const [popupTitle, setPopupTitle] = useState('');
-    
+
     useEffect(() => {
         console.log("Content State Updated:", popupContent);
-      }, [popupContent]);
-    
-      const handleYesClick = async () => {
+    }, [popupContent]);
+
+    const handleYesClick = async () => {
         if (selectedKeyword) {
-          const articleContent = await fetchData(selectedKeyword);
-          setPopupContent(articleContent);
+            const articleContent = await fetchData(selectedKeyword);
+            setPopupContent(articleContent);
         }
-      };
-    
-      const handleNoClick = () => {
-        spin();
-      };
+    };
+
+    const handleNoClick = () => {
+        setShowPopup(false); // This will hide the popup
+    };
     
       const fetchData = async (keyword) => {
         try {
@@ -145,44 +145,44 @@ const keywords = [
           setShowPopup(true);
         }, 2000);
       };
-    
-      return (
+
+    return (
         <div className="bg-[#2c4a27] text-[#f2f2f2] min-h-screen flex flex-col items-center justify-center p-4">
-        <h1 className="text-5xl font-bold mb-8">Personal Finance 101</h1>
-        <div className={`mt-8 text-3xl font-bold ${isSpinning ? 'animate-bounce' : ''}`}>
-          {selectedKeyword}
-        </div>
-        <button
-          className={`px-6 py-3 text-white font-bold rounded ${isSpinning ? 'bg-gray-500' : 'bg-blue-500 hover:bg-blue-700'} transition duration-300 ease-in-out`}
-          onClick={spin}
-          disabled={isSpinning}
-        >
-          {isSpinning ? 'Spinning...' : "Let's Play"}
-        </button>
-        {showPopup && (
-          <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center">
-            <div className="bg-white p-6 rounded shadow-lg text-black">
-              <h2 className="text-2xl font-bold mb-4">{popupTitle}</h2>
-              <p className="mb-4">{popupContent}</p>
-              <div className="flex justify-between">
-                <button
-                  onClick={handleYesClick}
-                  className="px-4 py-2 bg-green-500 hover:bg-green-700 text-white font-bold rounded"
-                >
-                  Yes
-                </button>
-                <button
-                  onClick={handleNoClick}
-                  className="px-4 py-2 bg-red-500 hover:bg-red-700 text-white font-bold rounded"
-                >
-                  No
-                </button>
-              </div>
+            <h1 className="text-5xl font-bold mb-8">Personal Finance 101</h1>
+            <div className={`mt-8 text-3xl font-bold ${isSpinning ? 'animate-bounce' : ''}`}>
+                {selectedKeyword}
             </div>
-          </div>
-        )}
-      </div>
+            <button
+                className={`px-6 py-3 text-white font-bold rounded ${isSpinning ? 'bg-gray-500' : 'bg-blue-500 hover:bg-blue-700'} transition duration-300 ease-in-out`}
+                onClick={spin}
+                disabled={isSpinning}
+            >
+                {isSpinning ? 'Spinning...' : "Let's Play"}
+            </button>
+            {showPopup && (
+                <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center">
+                    <div className="bg-white p-6 rounded shadow-lg text-black">
+                        <h2 className="text-2xl font-bold mb-4">{popupTitle}</h2>
+                        <p className="mb-4">{popupContent}</p>
+                        <div className="flex justify-between">
+                            <button
+                                onClick={handleYesClick}
+                                className="px-4 py-2 bg-green-500 hover:bg-green-700 text-white font-bold rounded mr-2" // Added margin-right to "Yes" button
+                            >
+                                Yes
+                            </button>
+                            <button
+                                onClick={handleNoClick}
+                                className="px-4 py-2 bg-red-500 hover:bg-red-700 text-white font-bold rounded"
+                            >
+                                No
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
     );
-  };    
-    
-    export default HomePage;
+};
+
+export default HomePage;

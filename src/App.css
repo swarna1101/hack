@@ -3,8 +3,10 @@
 }
 
 .App-logo {
-  height: 40vmin;
+  height: 60vmin; /* Increased from 40vmin to make the logo bigger */
   pointer-events: none;
+  margin: 0 auto; /* Added to center the logo horizontally */
+  display: block; /* Added to ensure the logo is treated as a block-level element */
 }
 
 @media (prefers-reduced-motion: no-preference) {
