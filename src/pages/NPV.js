@@ -5,7 +5,7 @@ import axios from 'axios';
 
 const NPV = () => {
   const [formData, setFormData] = useState({
-    initial_investment: -99,
+    initial_investment: 99,
     required_rate_of_return: 5,
     number_of_periods: 5,
     annual_inflow: 20000,
