@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Pie } from 'react-chartjs-2';
 import Chart from 'chart.js/auto'
 
 //import PieChart from '../components/PieChart'; // Update the import path as needed
@@ -33,6 +32,7 @@ const FinancialPlan = () => {
   }, [myChart]);
 
   // Function to create or update the chart
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const createChart = () => {
     if (myChart) {
       myChart.destroy();

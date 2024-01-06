@@ -92,25 +92,27 @@ const keywords = [
     const [isapicalled, setIsapicalled] = useState(false);
     const [popupContent, setPopupContent] = useState('');
     const [popupTitle, setPopupTitle] = useState('');
+    const [isLoading, setIsLoading] = useState(false); // Added loading state
   
     useEffect(() => {
       console.log("Content State Updated:", popupContent);
     }, [popupContent]);
   
     const handleYesClick = async () => {
-      if(isapicalled){
-        setIsapicalled(false);
-        setShowPopup(false); // Close the popup
-        setPopupTitle(''); // Reset popup title
-        setPopupContent(''); // Reset popup content
-      
-    }else{
-        if (selectedKeyword) {
-        const articleContent = await fetchData(selectedKeyword);
-        setPopupContent(articleContent);
-      }
-    }
-    };
+        if (isapicalled) {
+          setIsapicalled(false);
+          setShowPopup(false); // Close the popup
+          setPopupTitle(''); // Reset popup title
+          setPopupContent(''); // Reset popup content
+        } else {
+          if (selectedKeyword) {
+            setIsLoading(true); // Set loading state to true while fetching data
+            const articleContent = await fetchData(selectedKeyword);
+            setPopupContent(articleContent);
+            setIsLoading(false); // Set loading state to false after data is fetched
+          }
+        }
+      };
   
     const handleNoClick = () => {
         if(isapicalled){
@@ -166,13 +168,13 @@ const keywords = [
     };
   
     return (
-      <div className="bg-[#2c4a27] text-[#f2f2f2] min-h-screen flex flex-col items-center justify-center p-4">
+        <div className="bg-[#2c4a27] text-[#f2f2f2] min-h-screen flex flex-col items-center justify-center p-4">
         <h1 className="text-5xl font-bold mb-8">Personal Finance 101</h1>
         <div className={`mt-8 text-3xl font-bold ${isSpinning ? 'animate-bounce' : ''}`}>
           {selectedKeyword}
         </div>
         <button
-          className={`px-6 py-3 text-white font-bold rounded ${isSpinning ? 'bg-gray-500' : 'bg-blue-500 hover:bg-blue-700'} transition duration-300 ease-in-out`}
+          className={`px-6 py-3 mt-4 text-white font-bold rounded ${isSpinning ? 'bg-gray-500' : 'bg-blue-500 hover:bg-blue-700'} transition duration-300 ease-in-out`}
           onClick={spin}
           disabled={isSpinning}
         >
@@ -181,28 +183,35 @@ const keywords = [
         {showPopup && (
           <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center">
             <div className="bg-white p-6 rounded shadow-lg text-black">
-            <div className="mt-4 font-bold text-3xl">
-                 You Got : {selectedKeyword}
+              <div className="mt-4 font-bold text-3xl">
+                You Got : {selectedKeyword}
               </div>
               <h2 className="text-2xl font-bold mb-4">{popupTitle}</h2>
-              <p className="mb-4">{popupContent}</p>
-              
-              <p className="text-lg mb-4">Do you want more information for this?</p> {/* This line is added */}
-              <div className="flex justify-between">
-                <button
-                  onClick={handleYesClick}
-                  className="px-4 py-2 bg-green-500 hover:bg-green-700 text-white font-bold rounded mr-4"
-                >
-                  Yes
-                </button>
-                <button
-                  onClick={handleNoClick}
-                  className="px-4 py-2 bg-red-500 hover:bg-red-700 text-white font-bold rounded"
-                >
-                  No
-                </button>
-              </div>
-              
+              {isLoading ? ( // Show loading spinner while isLoading is true
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500 mx-auto my-4"></div>
+                  <p>Loading...</p>
+                </div>
+              ) : (
+                <>
+                  <p className="mb-4">{popupContent}</p>
+                  <p className="text-lg mb-4">Do you want more information for this?</p>
+                  <div className="flex justify-between">
+                    <button
+                      onClick={handleYesClick}
+                      className="px-4 py-2 bg-green-500 hover:bg-green-700 text-white font-bold rounded mr-4"
+                    >
+                      Yes
+                    </button>
+                    <button
+                      onClick={handleNoClick}
+                      className="px-4 py-2 bg-red-500 hover:bg-red-700 text-white font-bold rounded"
+                    >
+                      No
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}

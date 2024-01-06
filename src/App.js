@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
-import Navbar from './components/Navbar'; // Adjust the path based on your file structure
+import Navbar from './components/Navbar'; 
 // Import your page components
 import HomePage from './pages/HomePage';
 import NPV from './pages/NPV';
